@@ -1,3 +1,8 @@
 <resources>
     <string name="app_title">Ualá Coding Challenge</string>
+
+    <string name="common_retry">Retry</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="citylist_searchhint">Filter</string>
+    <string name="citylist_title">City List</string>
 </resources>

@@ -1,4 +1,4 @@
-package ignacio.guerendiain.uala.feature.map.ui
+package ignacio.guerendiain.uala.feature.cities.ui
 
 import androidx.compose.runtime.Composable
 

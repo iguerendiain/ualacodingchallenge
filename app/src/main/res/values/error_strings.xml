@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_cityloading">There was an error while trying to load the cities</string>
+    <string name="error_ioexception">Please make sure you have an active internet connection.</string>
+    <string name="error_runtimeexception">Something went wrong while reading data from the server.</string>
+    <string name="error_unknown">Unknown error.</string>
+    <string name="error_illegalargumentexception">Something went wrong while trying to call the server.</string>
+    <string name="error_serverresponse">[ Server response: %s ]</string>
+</resources>

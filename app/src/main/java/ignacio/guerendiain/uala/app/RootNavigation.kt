@@ -1,25 +1,28 @@
 package ignacio.guerendiain.uala.app
 
-import android.content.res.Configuration
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.layout.Row
+import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import ignacio.guerendiain.uala.app.NavigationUtils.DEFAULT_ANIMATION_DURATION
-import ignacio.guerendiain.uala.app.NavigationUtils.enterFromRightExitToLeft
-import ignacio.guerendiain.uala.feature.cities.ui.CityListContent
-import ignacio.guerendiain.uala.feature.cities.ui.CityListScreen
-import ignacio.guerendiain.uala.feature.map.ui.MapScreen
-import ignacio.guerendiain.uala.feature.map.ui.MapContent
+import ignacio.guerendiain.uala.R
+import ignacio.guerendiain.uala.core.theme.LocalCurrentColorPalette
+import ignacio.guerendiain.uala.core.ui.dialog.APIResultErrorDialog
+import ignacio.guerendiain.uala.core.util.LoadingStatus
+import ignacio.guerendiain.uala.feature.cities.MapCityNavigation
+import org.koin.androidx.compose.koinViewModel
 
 object RootNavArguments{
     const val ARGS_CITYID = "cityId"
@@ -43,51 +46,37 @@ enum class RootNavDestination(
 
 @Composable
 fun RootNavigation() {
-    val portrait = LocalContext
-        .current
-        .resources
-        .configuration
-        .orientation == Configuration.ORIENTATION_PORTRAIT
-
+    val activity = LocalActivity.current
     val navController = rememberNavController()
+    val mainViewModel = koinViewModel<MainViewModel>()
+    val mainState by mainViewModel.state.collectAsStateWithLifecycle()
 
-    if (portrait) RootPortraitNavigation(navController)
-    else LandscapeLayout()
-}
+    LaunchedEffect(Unit) { mainViewModel.initApp() }
 
-@Composable
-fun LandscapeLayout(){
-    Row(
-        modifier = Modifier.fillMaxSize()
-    ){
-        CityListContent()
-        MapContent()
-    }
-}
-
-@Composable
-fun RootPortraitNavigation(navController: NavHostController){
-    NavHost(
-        navController = navController,
-        startDestination = RootNavDestination.CITYLISTSCREEN.name
-    ){
-        enterFromRightExitToLeft(
-            route = RootNavDestination.CITYLISTSCREEN.name,
-            enterTransition = { fadeIn(animationSpec = tween(DEFAULT_ANIMATION_DURATION)) },
-        ){
-            CityListScreen()
-        }
-
-        enterFromRightExitToLeft(
-            route = "${RootNavDestination.MAPSCREEN.name}/{${RootNavArguments.ARGS_CITYID}}",
-            arguments = RootNavDestination.MAPSCREEN.arguments
-        ){
-            val cityId = it
-                .arguments
-                ?.getLong(RootNavArguments.ARGS_CITYID)
-                ?:-1
-
-            if (cityId > 0) MapScreen()
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LocalCurrentColorPalette.current.defaultScreenBackground)
+    ) {
+        when (mainState.citiesResponse.status) {
+            LoadingStatus.LOADING -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(70.dp),
+                    color = LocalCurrentColorPalette.current.lightText
+                )
+            }
+            LoadingStatus.SUCCESS -> {
+                MapCityNavigation(navController, mainViewModel)
+            }
+            LoadingStatus.ERROR -> {
+                APIResultErrorDialog(
+                    baseErrorResId = R.string.error_cityloading,
+                    result = mainState.citiesResponse,
+                    onRetry = { mainViewModel.initApp() },
+                    onCancel = { activity?.finish() }
+                )
+            }
         }
     }
 }
