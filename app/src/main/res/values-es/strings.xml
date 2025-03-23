@@ -5,4 +5,6 @@
     <string name="common_cancel">Cancelar</string>
     <string name="citylist_searchhint">Filtro</string>
     <string name="citylist_title">Lista de ciudades</string>
+    <string name="citylist_favorites">Favoritas</string>
+    <string name="citylist_all">Todas</string>
 </resources>

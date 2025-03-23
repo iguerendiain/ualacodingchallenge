@@ -19,10 +19,14 @@ fun CityListScreen(
     CityListContent(
         portraitMode = isPortrait(),
         searchQuery = searchQuery,
-        cities = mainState.citiesResponse.response?: listOf(),
+        cities = mainState.citiesResponse.response ?: listOf(),
         listState = listState,
+        showingFavorites = false,
 
         onSearch = onSearch,
-        onCloseKeyboard = {}
+        onCloseKeyboard = {},
+        onCitySelected = {},
+        onFavoriteToggle = {},
+        onToggleShowFavorites = {}
     )
 }

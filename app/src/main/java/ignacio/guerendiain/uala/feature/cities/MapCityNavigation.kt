@@ -13,9 +13,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -87,11 +84,15 @@ fun LandscapeLayout(
                 CityListContent(
                     portraitMode = false,
                     searchQuery = searchQuery,
-                    cities = mainState.citiesResponse.response?: listOf(),
+                    cities = mainState.citiesResponse.response ?: listOf(),
                     listState = listState,
+                    showingFavorites = false,
 
                     onSearch = onSearch,
-                    onCloseKeyboard = { }
+                    onCloseKeyboard = { },
+                    onCitySelected = { },
+                    onFavoriteToggle = { },
+                    onToggleShowFavorites = { }
                 )
             }
             Box(modifier = Modifier
