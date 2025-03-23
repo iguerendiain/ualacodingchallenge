@@ -51,7 +51,7 @@ fun RootNavigation() {
     val mainViewModel = koinViewModel<MainViewModel>()
     val mainState by mainViewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) { mainViewModel.initApp() }
+    LaunchedEffect(Unit) { mainViewModel.downloadCities() }
 
     Box(
         contentAlignment = Alignment.Center,
@@ -59,7 +59,7 @@ fun RootNavigation() {
             .fillMaxSize()
             .background(LocalCurrentColorPalette.current.defaultScreenBackground)
     ) {
-        when (mainState.citiesResponse.status) {
+        when (mainState.loadingResult.status) {
             LoadingStatus.LOADING -> {
                 CircularProgressIndicator(
                     modifier = Modifier.size(70.dp),
@@ -72,8 +72,8 @@ fun RootNavigation() {
             LoadingStatus.ERROR -> {
                 APIResultErrorDialog(
                     baseErrorResId = R.string.error_cityloading,
-                    result = mainState.citiesResponse,
-                    onRetry = { mainViewModel.initApp() },
+                    result = mainState.loadingResult,
+                    onRetry = { mainViewModel.downloadCities() },
                     onCancel = { activity?.finish() }
                 )
             }

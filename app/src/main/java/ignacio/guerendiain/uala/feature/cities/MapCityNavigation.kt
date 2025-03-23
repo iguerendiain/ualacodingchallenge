@@ -12,13 +12,14 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import ignacio.guerendiain.uala.R
-import ignacio.guerendiain.uala.app.MainState
 import ignacio.guerendiain.uala.app.MainViewModel
 import ignacio.guerendiain.uala.app.NavigationUtils.DEFAULT_ANIMATION_DURATION
 import ignacio.guerendiain.uala.app.NavigationUtils.enterFromRightExitToLeft
@@ -31,38 +32,41 @@ import ignacio.guerendiain.uala.feature.cities.ui.CityListContent
 import ignacio.guerendiain.uala.feature.cities.ui.CityListScreen
 import ignacio.guerendiain.uala.feature.cities.ui.MapContent
 import ignacio.guerendiain.uala.feature.cities.ui.MapScreen
+import ignacio.guerendiain.uala.feature.cities.vm.CityListViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MapCityNavigation(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    cityListViewModel: CityListViewModel = koinViewModel<CityListViewModel>()
 ) {
     val mainState by mainViewModel.state.collectAsStateWithLifecycle()
     val cityListScrollState = rememberLazyListState()
 
+    LaunchedEffect(mainState.loadingResult) {
+        cityListViewModel.filterCities()
+    }
+
     if (isPortrait()) RootPortraitNavigation(
         navController = navController,
-        mainViewModel = mainViewModel,
-        searchQuery = "",
-        cityListState = cityListScrollState,
-        onSearch = {  }
+        cityListViewModel = cityListViewModel,
+        listState = cityListScrollState
     )
     else LandscapeLayout(
-        mainState = mainState,
-        searchQuery = "",
-        listState = cityListScrollState,
-        onSearch = {  }
+        cityListViewModel = cityListViewModel,
+        listState = cityListScrollState
     )
 }
 
 
 @Composable
 fun LandscapeLayout(
-    mainState: MainState,
-    searchQuery: String,
-    listState: LazyListState,
-    onSearch: (query: String) -> Unit,
+    cityListViewModel: CityListViewModel,
+    listState: LazyListState
 ){
+    val cityListState by cityListViewModel.state.collectAsStateWithLifecycle()
+
     Column(modifier = Modifier
         .fillMaxSize()
         .safeContentPadding()) {
@@ -83,16 +87,23 @@ fun LandscapeLayout(
                 .weight(1f)){
                 CityListContent(
                     portraitMode = false,
-                    searchQuery = searchQuery,
-                    cities = mainState.citiesResponse.response ?: listOf(),
+                    searchQuery = cityListState.searchQuery?:"",
+                    cities = cityListState.listedCities,
                     listState = listState,
                     showingFavorites = false,
+                    loadingStatus = cityListState.loadingStatus,
 
-                    onSearch = onSearch,
+                    onSearch = {
+                        cityListViewModel.setSearchQuery(it)
+                        cityListViewModel.filterCities()
+                    },
                     onCloseKeyboard = { },
                     onCitySelected = { },
-                    onFavoriteToggle = { },
-                    onToggleShowFavorites = { }
+                    onFavoriteToggle = { cityListViewModel.toggleFavorite(it) },
+                    onToggleShowFavorites = {
+                        cityListViewModel.toggleFilterFavories()
+                        cityListViewModel.filterCities()
+                    }
                 )
             }
             Box(modifier = Modifier
@@ -107,10 +118,8 @@ fun LandscapeLayout(
 @Composable
 fun RootPortraitNavigation(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
-    searchQuery: String,
-    cityListState: LazyListState,
-    onSearch: (query: String) -> Unit
+    cityListViewModel: CityListViewModel,
+    listState: LazyListState
 ){
     NavHost(
         navController = navController,
@@ -121,10 +130,9 @@ fun RootPortraitNavigation(
             enterTransition = { fadeIn(animationSpec = tween(DEFAULT_ANIMATION_DURATION)) },
         ){
             CityListScreen(
-                mainViewModel = mainViewModel,
-                searchQuery = searchQuery,
-                listState = cityListState,
-                onSearch = onSearch
+                navController = navController,
+                cityListViewModel = cityListViewModel,
+                listState = listState
             )
         }
 

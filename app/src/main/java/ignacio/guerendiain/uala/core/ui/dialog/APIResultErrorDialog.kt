@@ -7,10 +7,10 @@ import ignacio.guerendiain.uala.core.network.APICallResult
 import java.io.IOException
 
 @Composable
-fun <T>APIResultErrorDialog(
+fun APIResultErrorDialog(
     baseError: String? = null,
     baseErrorResId: Int? = null,
-    result: APICallResult<T>,
+    result: APICallResult,
     onRetry: () -> Unit,
     onCancel: () -> Unit
 ){
@@ -25,8 +25,8 @@ fun <T>APIResultErrorDialog(
 }
 
 @Composable
-private fun <T>buildErrorDescription(
-    result: APICallResult<T>,
+private fun buildErrorDescription(
+    result: APICallResult,
     baseError: String? = null,
     baseErrorResId: Int? = null
 ): String{

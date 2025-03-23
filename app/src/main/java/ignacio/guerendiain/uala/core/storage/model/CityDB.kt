@@ -9,5 +9,6 @@ data class CityDB(
     val name: String?,
     val country: String?,
     val lat: Double?,
-    val lon: Double?
+    val lon: Double?,
+    val favorite: Boolean
 )

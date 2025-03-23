@@ -14,36 +14,67 @@ class CityRepositoryRoomDBRetrofit(
     private val db: MainDB,
     private val cityCalls: CityCalls
 ): CityRepository, NetworkRepository {
-    override suspend fun downloadCities(): APICallResult<List<City>> {
-        return runCall { cityCalls.getCities() }
-            .map { apiList ->
-                apiList
-                    ?.mapNotNull { APIModelMapper.buildCityFrom(it) }
-                    ?: listOf()
-            }
+    override suspend fun downloadCities(): Pair<APICallResult, List<City>> {
+        val response = runCall { cityCalls.getCities() }
+
+        return Pair(
+            response.first,
+            response.second?.mapNotNull {  APIModelMapper.buildCityFrom(it) }?:listOf()
+        )
     }
 
     override suspend fun storeCities(cities: List<City>) {
         db
             .cityDao()
             .apply {
+                val favorites = getFavoriteIds()
                 clearCities()
-                storeCities(cities.map { DBModelMapper.buildCityDBFrom(it) })
+                storeCities(cities.map {
+                    DBModelMapper.buildCityDBFrom(
+                        it,
+                        favorites.find { c -> c == it.id } != null
+                    )
+                })
             }
-    }
-
-    override suspend fun listCities(): List<City> {
-        return db
-            .cityDao()
-            .listCities()
-            .map { DBModelMapper.buildCityFrom(it) }
-    }
-
-    override suspend fun searchCities(query: String): List<City> {
-        return listCities()
     }
 
     override suspend fun areCitiesDownloaded(): Boolean {
         return db.cityDao().getCityCount() > 0
+    }
+
+    override suspend fun favoriteCity(id: Long) {
+        db.cityDao().favoriteCity(id)
+    }
+
+    override suspend fun unfavoriteCity(id: Long) {
+        db.cityDao().unfavoriteCity(id)
+    }
+
+    override suspend fun getAllCities(): List<City> {
+        return db
+            .cityDao()
+            .getAllCities()
+            .map { DBModelMapper.buildCityFrom(it) }
+    }
+
+    override suspend fun getFavoriteCities(): List<City> {
+        return db
+            .cityDao()
+            .getFavoriteCities()
+            .map { DBModelMapper.buildCityFrom(it) }
+    }
+
+    override suspend fun filterCities(query: String): List<City> {
+        return db
+            .cityDao()
+            .searchCities(query)
+            .map { DBModelMapper.buildCityFrom(it) }
+    }
+
+    override suspend fun filterFavoriteCities(query: String): List<City> {
+        return db
+            .cityDao()
+            .searchFavoriteCities(query)
+            .map { DBModelMapper.buildCityFrom(it) }
     }
 }

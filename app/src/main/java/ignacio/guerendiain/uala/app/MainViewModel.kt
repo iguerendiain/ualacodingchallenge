@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ignacio.guerendiain.uala.core.domain.repository.CityRepository
 import ignacio.guerendiain.uala.core.network.APICallResult
-import ignacio.guerendiain.uala.core.ui.dialog.APIResultErrorDialog
 import ignacio.guerendiain.uala.core.util.LoadingStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,33 +18,22 @@ class MainViewModel(
     private val _state = MutableStateFlow(MainState.DEFAULT)
     val state = _state.asStateFlow()
 
-    fun initApp(){
-        if (state.value.citiesResponse.response.isNullOrEmpty()) {
-            _state.update { MainState(citiesResponse = APICallResult(LoadingStatus.LOADING)) }
-            viewModelScope.launch(Dispatchers.IO) {
-                val areCitiesDownloaded = cityRepository.areCitiesDownloaded()
+    fun downloadCities(){
+        _state.update { MainState(loadingResult = APICallResult(LoadingStatus.LOADING)) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val areCitiesDownloaded = cityRepository.areCitiesDownloaded()
 
-                if (!areCitiesDownloaded) {
-                    val downloadedCitiesResult = cityRepository.downloadCities()
+            if (!areCitiesDownloaded) {
+                val downloadedCitiesResponse = cityRepository.downloadCities()
+                val downloadedCities = downloadedCitiesResponse.second
+                val downloadedCitiesResult = downloadedCitiesResponse.first
 
-                    if (downloadedCitiesResult.status == LoadingStatus.SUCCESS) {
-                        downloadedCitiesResult.response?.let {
-                            cityRepository.storeCities(it)
-                        }
-                        loadCitiesFromDB()
-                    } else
-                        _state.update { MainState(citiesResponse = downloadedCitiesResult) }
-                } else
-                    loadCitiesFromDB()
-            }
+                if (downloadedCitiesResult.status == LoadingStatus.SUCCESS)
+                    downloadedCities?.let { cityRepository.storeCities(it) }
+
+                _state.update { MainState(loadingResult = downloadedCitiesResult) }
+            }else
+                _state.update { MainState(loadingResult = APICallResult(LoadingStatus.SUCCESS)) }
         }
-    }
-
-    private suspend fun loadCitiesFromDB(){
-        val storedCities = cityRepository.listCities()
-        _state.update { MainState(citiesResponse = APICallResult(
-            status = LoadingStatus.SUCCESS,
-            response = storedCities
-        ))}
     }
 }

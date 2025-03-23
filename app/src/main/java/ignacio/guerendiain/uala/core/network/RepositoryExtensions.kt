@@ -7,23 +7,22 @@ interface NetworkRepository
 
 suspend fun<T> NetworkRepository.runCall(
     call: suspend () -> Response<T>
-): APICallResult<T> {
+): Pair<APICallResult, T?> {
     try {
         val response = call()
 
-        return if (response.isSuccessful) APICallResult(
+        return if (response.isSuccessful) Pair(APICallResult(
             status = LoadingStatus.SUCCESS,
-            response = response.body(),
             httpStatusCode = response.code()
-        ) else APICallResult(
+        ), response.body()) else Pair(APICallResult(
             status = LoadingStatus.ERROR,
             httpStatusCode = response.code(),
             errorBody = response.errorBody()?.string()
-        )
+        ), null)
     }catch(e: Exception){
-        return APICallResult(
+        return Pair(APICallResult(
             status = LoadingStatus.ERROR,
             exception = e
-        )
+        ), null)
     }
 }

@@ -4,29 +4,36 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ignacio.guerendiain.uala.app.MainViewModel
+import androidx.navigation.NavHostController
 import ignacio.guerendiain.uala.core.ui.util.isPortrait
+import ignacio.guerendiain.uala.feature.cities.vm.CityListViewModel
 
 @Composable
 fun CityListScreen(
-    mainViewModel: MainViewModel,
-    searchQuery: String,
-    listState: LazyListState,
-    onSearch: (query: String) -> Unit
+    navController: NavHostController,
+    cityListViewModel: CityListViewModel,
+    listState: LazyListState
 ){
-    val mainState by mainViewModel.state.collectAsStateWithLifecycle()
+    val cityListState by cityListViewModel.state.collectAsStateWithLifecycle()
 
     CityListContent(
         portraitMode = isPortrait(),
-        searchQuery = searchQuery,
-        cities = mainState.citiesResponse.response ?: listOf(),
+        searchQuery = cityListState.searchQuery ?: "",
+        cities = cityListState.listedCities,
         listState = listState,
-        showingFavorites = false,
+        showingFavorites = cityListState.filterFavorites,
+        loadingStatus = cityListState.loadingStatus,
 
-        onSearch = onSearch,
+        onSearch = {
+            cityListViewModel.setSearchQuery(it)
+            cityListViewModel.filterCities()
+        },
         onCloseKeyboard = {},
         onCitySelected = {},
-        onFavoriteToggle = {},
-        onToggleShowFavorites = {}
+        onFavoriteToggle = { cityListViewModel.toggleFavorite(it) },
+        onToggleShowFavorites = {
+            cityListViewModel.toggleFilterFavories()
+            cityListViewModel.filterCities()
+        },
     )
 }

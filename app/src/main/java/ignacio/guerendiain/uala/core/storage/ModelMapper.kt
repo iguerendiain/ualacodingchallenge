@@ -9,14 +9,16 @@ object DBModelMapper{
         name = cityDB.name?:"",
         country = cityDB.country?:"",
         lat = cityDB.lat,
-        lon = cityDB.lon
+        lon = cityDB.lon,
+        isFavorite = cityDB.favorite
     )
 
-    fun buildCityDBFrom(city: City) = CityDB(
+    fun buildCityDBFrom(city: City, favorite: Boolean) = CityDB(
         _id = city.id,
         name = city.name,
         country = city.country,
         lat = city.lat,
-        lon = city.lon
+        lon = city.lon,
+        favorite = favorite
     )
 }

@@ -10,7 +10,8 @@ object APIModelMapper{
                 name = cityAPI.name?:"",
                 country = cityAPI.country?:"",
                 lat = cityAPI.coord?.lat,
-                lon = cityAPI.coord?.lon
+                lon = cityAPI.coord?.lon,
+                isFavorite = false
             )
         }
     }
