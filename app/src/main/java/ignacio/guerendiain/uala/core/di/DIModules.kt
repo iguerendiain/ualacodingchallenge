@@ -8,6 +8,7 @@ import ignacio.guerendiain.uala.core.domain.repositoryimpl.CityRepositoryRoomDBR
 import ignacio.guerendiain.uala.core.network.buildCityCalls
 import ignacio.guerendiain.uala.core.storage.buildRoomDB
 import ignacio.guerendiain.uala.feature.cities.vm.CityListViewModel
+import ignacio.guerendiain.uala.feature.cities.vm.MapViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -18,4 +19,5 @@ val commonDIModule = module {
     single { buildCityCalls(ContextCompat.getString(get(), R.string.api_base_url)) }
     viewModel { MainViewModel(get()) }
     viewModel { CityListViewModel(get()) }
+    viewModel { MapViewModel(get()) }
 }

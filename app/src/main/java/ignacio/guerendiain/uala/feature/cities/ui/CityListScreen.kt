@@ -6,6 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import ignacio.guerendiain.uala.core.ui.util.isPortrait
+import ignacio.guerendiain.uala.feature.cities.MapCityArguments
+import ignacio.guerendiain.uala.feature.cities.MapCityDestinations
 import ignacio.guerendiain.uala.feature.cities.vm.CityListViewModel
 
 @Composable
@@ -29,7 +31,9 @@ fun CityListScreen(
             cityListViewModel.filterCities()
         },
         onCloseKeyboard = {},
-        onCitySelected = {},
+        onCitySelected = {
+            navController.navigate("${ MapCityDestinations.MAPSCREEN.name}/$it")
+        },
         onFavoriteToggle = { cityListViewModel.toggleFavorite(it) },
         onToggleShowFavorites = {
             cityListViewModel.toggleFilterFavories()

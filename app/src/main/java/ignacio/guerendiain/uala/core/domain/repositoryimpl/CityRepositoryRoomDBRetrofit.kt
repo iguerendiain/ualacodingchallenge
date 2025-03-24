@@ -77,4 +77,11 @@ class CityRepositoryRoomDBRetrofit(
             .searchFavoriteCities(query)
             .map { DBModelMapper.buildCityFrom(it) }
     }
+
+    override suspend fun getCityById(id: Long): City? {
+        return db
+            .cityDao()
+            .getCityById(id)
+            ?.let { DBModelMapper.buildCityFrom(it) }
+    }
 }

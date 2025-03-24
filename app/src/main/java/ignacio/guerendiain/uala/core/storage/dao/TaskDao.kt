@@ -17,7 +17,7 @@ interface CityDao {
     @Query("select * from city")
     fun getAllCities(): List<CityDB>
 
-    @Query("select * from city where favorite == 1 and lower(name) like lower(:query) || '%'")
+    @Query("select * from city where favorite = 1 and lower(name) like lower(:query) || '%'")
     fun searchFavoriteCities(query: String): List<CityDB>
 
     @Query("select * from city where lower(name) like lower(:query) || '%'")
@@ -26,10 +26,10 @@ interface CityDao {
     @Query("select count() from city")
     fun getCityCount(): Int
 
-    @Query("select * from city where favorite == 1")
+    @Query("select * from city where favorite = 1")
     fun getFavoriteCities(): List<CityDB>
 
-    @Query("select _id from city where favorite == 1")
+    @Query("select _id from city where favorite = 1")
     fun getFavoriteIds(): List<Long>
 
     @Query("update city set favorite = 1 where _id = :id")
@@ -37,4 +37,7 @@ interface CityDao {
 
     @Query("update city set favorite = 0 where _id = :id")
     fun unfavoriteCity(id: Long)
+
+    @Query("select * from city where _id = :id limit 1")
+    fun getCityById(id: Long): CityDB?
 }

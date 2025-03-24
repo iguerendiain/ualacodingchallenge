@@ -2,6 +2,7 @@ package ignacio.guerendiain.uala.feature.cities
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,15 +17,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navArgument
 import ignacio.guerendiain.uala.R
 import ignacio.guerendiain.uala.app.MainViewModel
 import ignacio.guerendiain.uala.app.NavigationUtils.DEFAULT_ANIMATION_DURATION
 import ignacio.guerendiain.uala.app.NavigationUtils.enterFromRightExitToLeft
-import ignacio.guerendiain.uala.app.RootNavArguments
-import ignacio.guerendiain.uala.app.RootNavDestination
+import ignacio.guerendiain.uala.core.ui.button.ToolbarTextButton
 import ignacio.guerendiain.uala.core.ui.common.ScreenTitle
 import ignacio.guerendiain.uala.core.ui.common.Toolbar
 import ignacio.guerendiain.uala.core.ui.util.isPortrait
@@ -33,7 +35,28 @@ import ignacio.guerendiain.uala.feature.cities.ui.CityListScreen
 import ignacio.guerendiain.uala.feature.cities.ui.MapContent
 import ignacio.guerendiain.uala.feature.cities.ui.MapScreen
 import ignacio.guerendiain.uala.feature.cities.vm.CityListViewModel
+import ignacio.guerendiain.uala.feature.cities.vm.MapViewModel
 import org.koin.androidx.compose.koinViewModel
+
+object MapCityArguments{
+    const val ARGS_CITYID = "cityId"
+}
+
+enum class MapCityDestinations(
+    val arguments: List<NamedNavArgument> = listOf()
+){
+    CITYLISTSCREEN,
+    MAPSCREEN(
+        arguments = listOf(
+            navArgument(MapCityArguments.ARGS_CITYID)
+            {
+                type = NavType.LongType
+                nullable = false
+                defaultValue = -1
+            }
+        )
+    )
+}
 
 @Composable
 fun MapCityNavigation(
@@ -63,9 +86,11 @@ fun MapCityNavigation(
 @Composable
 fun LandscapeLayout(
     cityListViewModel: CityListViewModel,
-    listState: LazyListState
+    listState: LazyListState,
+    mapViewModel: MapViewModel = koinViewModel()
 ){
     val cityListState by cityListViewModel.state.collectAsStateWithLifecycle()
+    val mapState by mapViewModel.state.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -75,7 +100,16 @@ fun LandscapeLayout(
             centerContent = {
                 ScreenTitle(titleRes = R.string.citylist_title)
             },
-            endContent = {}
+            endContent = {
+                ToolbarTextButton(
+                    res = if (cityListState.filterFavorites) R.string.citylist_all
+                    else R.string.citylist_favorites,
+                    modifier = Modifier.clickable {
+                        cityListViewModel.toggleFilterFavories()
+                        cityListViewModel.filterCities()
+                    }
+                )
+            }
         )
         Row(
             modifier = Modifier
@@ -84,7 +118,7 @@ fun LandscapeLayout(
         ){
             Box(modifier = Modifier
                 .fillMaxHeight()
-                .weight(1f)){
+                .weight(.4f)){
                 CityListContent(
                     portraitMode = false,
                     searchQuery = cityListState.searchQuery?:"",
@@ -98,7 +132,7 @@ fun LandscapeLayout(
                         cityListViewModel.filterCities()
                     },
                     onCloseKeyboard = { },
-                    onCitySelected = { },
+                    onCitySelected = { mapViewModel.loadCity(it) },
                     onFavoriteToggle = { cityListViewModel.toggleFavorite(it) },
                     onToggleShowFavorites = {
                         cityListViewModel.toggleFilterFavories()
@@ -108,8 +142,12 @@ fun LandscapeLayout(
             }
             Box(modifier = Modifier
                 .fillMaxHeight()
-                .weight(1f)) {
-                MapContent()
+                .weight(.6f)) {
+                MapContent(
+                    city = mapState.city,
+                    isPortrait = false,
+                    onBack = {}
+                )
             }
         }
     }
@@ -123,10 +161,10 @@ fun RootPortraitNavigation(
 ){
     NavHost(
         navController = navController,
-        startDestination = RootNavDestination.CITYLISTSCREEN.name
+        startDestination = MapCityDestinations.CITYLISTSCREEN.name
     ){
         enterFromRightExitToLeft(
-            route = RootNavDestination.CITYLISTSCREEN.name,
+            route = MapCityDestinations.CITYLISTSCREEN.name,
             enterTransition = { fadeIn(animationSpec = tween(DEFAULT_ANIMATION_DURATION)) },
         ){
             CityListScreen(
@@ -137,15 +175,18 @@ fun RootPortraitNavigation(
         }
 
         enterFromRightExitToLeft(
-            route = "${RootNavDestination.MAPSCREEN.name}/{${RootNavArguments.ARGS_CITYID}}",
-            arguments = RootNavDestination.MAPSCREEN.arguments
+            route = "${MapCityDestinations.MAPSCREEN.name}/{${MapCityArguments.ARGS_CITYID}}",
+            arguments = MapCityDestinations.MAPSCREEN.arguments
         ){
             val cityId = it
                 .arguments
-                ?.getLong(RootNavArguments.ARGS_CITYID)
+                ?.getLong(MapCityArguments.ARGS_CITYID)
                 ?:-1
 
-            if (cityId > 0) MapScreen()
+            if (cityId > 0) MapScreen(
+                navController = navController,
+                cityId = cityId
+            )
         }
     }
 }

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,6 +22,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         resValue("string", "api_base_url", "https://gist.githubusercontent.com/hernan-uala/dce8843a8edbe0b0018b32e137bc2b3a/raw/0996accf70cb0ca0e16f9a99e0ee185fafca7af1/")
+
+        manifestPlaceholders["GOOGLE_GEO_API_KEY"] = getLocalProperty("google_api_key", "")
     }
 
     room {
@@ -44,6 +48,17 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+fun getLocalProperty(propertyKey: String, defaultValue: String): String {
+    val properties = Properties()
+    val localPropertiesFile = project.rootProject.file("local.properties")
+    return if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.inputStream())
+        properties.getProperty(propertyKey) ?: defaultValue
+    } else {
+        defaultValue
     }
 }
 
@@ -80,9 +95,10 @@ dependencies {
     implementation(libs.converter.gson)
 
     // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 
-    val room_version = "2.6.1"
+    // Google Maps
+    implementation(libs.maps.compose)
 
-    implementation("androidx.room:room-runtime:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
 }

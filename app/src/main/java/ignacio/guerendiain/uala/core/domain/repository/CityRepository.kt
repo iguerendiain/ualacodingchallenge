@@ -13,4 +13,5 @@ interface CityRepository{
     suspend fun getFavoriteCities(): List<City>
     suspend fun filterCities(query: String): List<City>
     suspend fun filterFavoriteCities(query: String): List<City>
+    suspend fun getCityById(id: Long): City?
 }

@@ -13,9 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.navArgument
-import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
 import ignacio.guerendiain.uala.R
 import ignacio.guerendiain.uala.core.theme.LocalCurrentColorPalette
@@ -23,26 +20,6 @@ import ignacio.guerendiain.uala.core.ui.dialog.APIResultErrorDialog
 import ignacio.guerendiain.uala.core.util.LoadingStatus
 import ignacio.guerendiain.uala.feature.cities.MapCityNavigation
 import org.koin.androidx.compose.koinViewModel
-
-object RootNavArguments{
-    const val ARGS_CITYID = "cityId"
-}
-
-enum class RootNavDestination(
-    val arguments: List<NamedNavArgument> = listOf()
-){
-    CITYLISTSCREEN,
-    MAPSCREEN(
-        arguments = listOf(
-            navArgument(RootNavArguments.ARGS_CITYID)
-            {
-                type = NavType.LongType
-                nullable = false
-                defaultValue = -1
-            }
-        )
-    )
-}
 
 @Composable
 fun RootNavigation() {

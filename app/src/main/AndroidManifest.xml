@@ -15,6 +15,11 @@
         android:theme="@style/Theme.UaláCodingChallenge"
         android:name=".app.MainApp"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${GOOGLE_GEO_API_KEY}"
+        />
+
         <activity
             android:name=".app.MainActivity"
             android:exported="true"
