@@ -7,6 +7,9 @@ import ignacio.guerendiain.uala.core.storage.model.CityDB
 
 @Dao
 interface CityDao {
+    companion object{
+        const val DEFAULT_SORT = "order by name,country"
+    }
 
     @Insert
     fun storeCities(cities: List<CityDB>)
@@ -14,19 +17,19 @@ interface CityDao {
     @Query("delete from city")
     fun clearCities()
 
-    @Query("select * from city")
+    @Query("select * from city $DEFAULT_SORT")
     fun getAllCities(): List<CityDB>
 
-    @Query("select * from city where favorite = 1 and lower(name) like lower(:query) || '%'")
+    @Query("select * from city where favorite = 1 and lower(name) like lower(:query) || '%' $DEFAULT_SORT")
     fun searchFavoriteCities(query: String): List<CityDB>
 
-    @Query("select * from city where lower(name) like lower(:query) || '%'")
+    @Query("select * from city where lower(name) like lower(:query) || '%' $DEFAULT_SORT")
     fun searchCities(query: String): List<CityDB>
 
     @Query("select count() from city")
     fun getCityCount(): Int
 
-    @Query("select * from city where favorite = 1")
+    @Query("select * from city where favorite = 1 $DEFAULT_SORT")
     fun getFavoriteCities(): List<CityDB>
 
     @Query("select _id from city where favorite = 1")
