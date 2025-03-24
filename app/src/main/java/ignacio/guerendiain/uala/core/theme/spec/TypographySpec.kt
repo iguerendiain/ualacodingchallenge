@@ -7,9 +7,7 @@ data class TypographySpec(
     val dialogDescription: TextStyle,
     val itemTitle: TextStyle,
     val itemSubtitle: TextStyle,
-    val defaultBigText: TextStyle,
     val buttonText: TextStyle,
-    val defaultMediumText: TextStyle,
     val defaultScreenTitle: TextStyle,
     val defaultInputValue: TextStyle,
     val toolbarButton: TextStyle

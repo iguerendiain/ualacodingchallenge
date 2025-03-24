@@ -63,7 +63,7 @@ fun CityListItem(
             else
                 R.drawable.ic_favorite_off
             ),
-            colorFilter = ColorFilter.tint(LocalCurrentColorPalette.current.mainButtonColorBg),
+            colorFilter = ColorFilter.tint(LocalCurrentColorPalette.current.accentColor),
             contentDescription = null
         )
     }

@@ -11,16 +11,6 @@ val DefaultTypographyDefs = TypographySpec(
         fontWeight = FontWeight.SemiBold,
         fontSize = 13.sp
     ),
-    defaultMediumText = TextStyle(
-        fontWeight = FontWeight.Normal,
-        lineHeight = 26.sp,
-        fontSize = 16.sp
-    ),
-    defaultBigText = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
-    ),
     defaultScreenTitle = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp

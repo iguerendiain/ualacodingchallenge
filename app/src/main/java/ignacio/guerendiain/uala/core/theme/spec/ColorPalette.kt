@@ -13,27 +13,19 @@ data class ColorPalette(
     val dialogButtonRetryFg: Color,
     val dialogImageBgWarning: Color,
     val dialogImageTintWarning: Color,
-    val dialogImageBgFatal: Color,
-    val dialogImageTintFatal: Color,
 
     // Button
-    val mainButtonColorBg: Color,
-    val mainButtonColorFg: Color,
     val defaultButton: Color,
-    val importantButtonBg: Color,
-    val importantButtonFg: Color,
     val disabledButtonBg: Color,
     val disabledButtonFg: Color,
 
     // Common
+    val accentColor: Color,
     val itemSubtitle: Color,
     val defaultScreenBackground: Color,
     val mainTextFieldBg: Color,
     val toolbarTextButton: Color,
-    val cardBorder: Color,
-    val importantText: Color,
     val defaultText: Color,
     val lightText: Color,
-    val textLink: Color,
     val defaultDivider: Color
 )

@@ -15,27 +15,19 @@ val DarkColorPalette = ColorPalette(
     dialogButtonRetryFg = ColorDB.GrayLight1,
     dialogImageBgWarning = ColorDB.YellowMain,
     dialogImageTintWarning = ColorDB.White,
-    dialogImageBgFatal = ColorDB.RedMainDark,
-    dialogImageTintFatal = ColorDB.White,
 
     // Button
     defaultButton = ColorDB.White,
-    importantButtonBg = ColorDB.RedMainDark,
-    importantButtonFg = ColorDB.White,
     disabledButtonBg = ColorDB.GrayLight1,
     disabledButtonFg = ColorDB.GrayMain,
-    mainButtonColorBg = ColorDB.CyanDark,
-    mainButtonColorFg = ColorDB.White,
+    accentColor = ColorDB.CyanDark,
 
     // Common
     defaultScreenBackground = Color.Black,
     mainTextFieldBg = ColorDB.GrayDark,
     toolbarTextButton = ColorDB.BlueMain,
-    cardBorder = ColorDB.GrayDark,
     itemSubtitle = ColorDB.GrayLight1,
-    importantText = ColorDB.RedMain,
     defaultText = ColorDB.White,
     lightText = ColorDB.GrayLight1,
-    textLink = ColorDB.BlueMain,
-    defaultDivider = ColorDB.CyanDark,
+    defaultDivider = ColorDB.GrayDark,
 )

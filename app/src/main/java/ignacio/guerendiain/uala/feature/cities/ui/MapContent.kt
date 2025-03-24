@@ -27,6 +27,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import ignacio.guerendiain.uala.R
 import ignacio.guerendiain.uala.core.domain.model.City
+import ignacio.guerendiain.uala.core.ui.button.BackButton
 import ignacio.guerendiain.uala.core.ui.button.ToolbarIconButton
 import ignacio.guerendiain.uala.core.ui.common.Toolbar
 import ignacio.guerendiain.uala.core.ui.util.StatusbarSpacer
@@ -87,10 +88,7 @@ fun MapContent(
                 StatusbarSpacer()
                 Toolbar(
                     startContent = {
-                        ToolbarIconButton(
-                            res = R.drawable.ic_back,
-                            modifier = Modifier.clickable { onBack() }
-                        )
+                        BackButton(modifier = Modifier.clickable { onBack() })
                     },
                     centerContent = {},
                     endContent = {}
